@@ -5568,21 +5568,29 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
   });
 }
 
-// functions/getGenres.js
+// functions/getMovies.js
 exports.handler = async function(event) {
-  const limit = JSON.parse(event.body);
+  const body = JSON.parse(event.body);
+  const genre = body.genre;
+  const pageState = body.pageState;
   const url = process.env.ASTRA_GRAPHQL_ENDPOINT;
   const query = `
-    query getAllGenres {
-      reference_list (
-        value: { label: "genre"},
-        options: { limit: ${JSON.stringify(limit)} }
-      ) {
-        values {
-          value
-        }
+  query {
+    movies_by_genre (
+      value: { genre: ${JSON.stringify(genre)}},
+      orderBy: [year_DESC],
+      options: { pageSize: 6, pageState: ${JSON.stringify(pageState)} }
+    ) {
+      values {
+        year,
+        title,
+        duration,
+        synopsis,
+        thumbnail
       }
+      pageState
     }
+  }
   `;
   const response = await fetch(url, {
     method: "POST",
@@ -5609,4 +5617,4 @@ exports.handler = async function(event) {
 /*! fetch-blob. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
 /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
 /*! node-domexception. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
-//# sourceMappingURL=getGenres.js.map
+//# sourceMappingURL=getMovies.js.map
